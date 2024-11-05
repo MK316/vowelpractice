@@ -45,7 +45,8 @@ if st.button("Start Quiz"):
     st.session_state.current_symbol, st.session_state.current_data = select_random_symbol()
 
 if "current_symbol" in st.session_state:
-    st.write(f"IPA Symbol: {st.session_state.current_symbol}")
+    # Display the IPA Symbol in larger font size
+    st.markdown(f"<h2>IPA Symbol: {st.session_state.current_symbol}</h2>", unsafe_allow_html=True)
     
     # Using columns to organize the options
     col1, col2, col3, col4 = st.columns([2, 2, 2, 2])
