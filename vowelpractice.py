@@ -43,23 +43,28 @@ if st.button("Start Quiz"):
     st.session_state.attempts = 0
     st.session_state.current_symbol, st.session_state.current_data = select_random_symbol()
 
-# Check if a symbol has been selected
 if "current_symbol" in st.session_state:
     # Display the IPA Symbol along with its Name
     st.markdown(f"<h2>IPA Symbol: {st.session_state.current_symbol} ({st.session_state.current_data['Name']})</h2>", unsafe_allow_html=True)
     
-    # Set default selected options based on session state to retain values after "Show & Continue"
+    # Handling None values in session state to avoid index error
+    height_default = st.session_state.get("user_height", "High") or "High"
+    backness_default = st.session_state.get("user_backness", "Front") or "Front"
+    rounding_default = st.session_state.get("user_rounding", "Unrounded") or "Unrounded"
+    tense_lax_default = st.session_state.get("user_tense_lax", "Tense") or "Tense"
+    
+    # Display radio buttons with preserved selections
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        height = st.radio("Height", ['High', 'Mid', 'Low'], index=['High', 'Mid', 'Low'].index(st.session_state.get("user_height", "High")))
+        height = st.radio("Height", ['High', 'Mid', 'Low'], index=['High', 'Mid', 'Low'].index(height_default))
     with col2:
-        backness = st.radio("Backness", ['Front', 'Central', 'Back'], index=['Front', 'Central', 'Back'].index(st.session_state.get("user_backness", "Front")))
+        backness = st.radio("Backness", ['Front', 'Central', 'Back'], index=['Front', 'Central', 'Back'].index(backness_default))
     with col3:
-        rounding = st.radio("Rounding", ['Rounded', 'Unrounded'], index=['Rounded', 'Unrounded'].index(st.session_state.get("user_rounding", "Unrounded")))
+        rounding = st.radio("Rounding", ['Rounded', 'Unrounded'], index=['Rounded', 'Unrounded'].index(rounding_default))
     with col4:
-        tense_lax = st.radio("Tense/Lax", ['Tense', 'Lax'], index=['Tense', 'Lax'].index(st.session_state.get("user_tense_lax", "Tense")))
+        tense_lax = st.radio("Tense/Lax", ['Tense', 'Lax'], index=['Tense', 'Lax'].index(tense_lax_default))
 
-    # Store the current selections in session state for persistence
+    # Store current selections in session state to persist choices
     st.session_state.user_height = height
     st.session_state.user_backness = backness
     st.session_state.user_rounding = rounding
@@ -82,7 +87,8 @@ if "current_symbol" in st.session_state:
     # Show score and move to next symbol on "Show score & Continue"
     if continue_pressed:
         st.write(f"{st.session_state.user_name if 'user_name' in st.session_state else 'User'}'s score: {st.session_state.correct_count} out of {st.session_state.attempts}")
-        st.session_state.current_symbol, st.session_state.current_data = select_random_symbol()  # Update symbol for next question
+        # Update symbol for next question
+        st.session_state.current_symbol, st.session_state.current_data = select_random_symbol()
         # Clear previous selections for the next question
         for key in ["user_height", "user_backness", "user_rounding", "user_tense_lax"]:
             st.session_state[key] = None  # Reset selections for the next question
