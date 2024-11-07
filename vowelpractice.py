@@ -17,12 +17,12 @@ vowel_data = {
 }
 
 def select_random_symbol():
-    """Select a random vowel symbol."""
+    """Select a random vowel symbol"""
     symbol = random.choice(list(vowel_data.keys()))
     return symbol, vowel_data[symbol]
 
 def validate_selections(ipa_symbol, user_height, user_backness, user_rounding, user_tense_lax):
-    """Check user's selections against the actual vowel properties."""
+    """Check user's selections against the actual vowel properties"""
     correct_data = vowel_data[ipa_symbol]
     correct = (correct_data['Height'] == user_height and
                correct_data['Backness'] == user_backness and
@@ -33,11 +33,11 @@ def validate_selections(ipa_symbol, user_height, user_backness, user_rounding, u
 # Main interface with Streamlit
 st.title("💧 Vowel Practice App")
 
-# User name input
+# Textbox for user name input, always available
 user_name = st.text_input("Enter your name:", value=st.session_state.get('user_name', ""))
 
 # Start quiz button
-if st.button("Start Quiz"):
+if st.button("Start Quiz") or "current_symbol" not in st.session_state:
     st.session_state.user_name = user_name
     st.session_state.correct_count = 0
     st.session_state.attempts = 0
@@ -49,10 +49,10 @@ if "current_symbol" in st.session_state:
     st.markdown(f"<h2>IPA Symbol: {st.session_state.current_symbol} ({st.session_state.current_data['Name']})</h2>", unsafe_allow_html=True)
     
     # Define default selections with error handling
-    height_default = st.session_state.get("user_height", "High") or "High"
-    backness_default = st.session_state.get("user_backness", "Front") or "Front"
-    rounding_default = st.session_state.get("user_rounding", "Unrounded") or "Unrounded"
-    tense_lax_default = st.session_state.get("user_tense_lax", "Tense") or "Tense"
+    height_default = st.session_state.get("user_height", "High")
+    backness_default = st.session_state.get("user_backness", "Front")
+    rounding_default = st.session_state.get("user_rounding", "Unrounded")
+    tense_lax_default = st.session_state.get("user_tense_lax", "Tense")
     
     # Display radio buttons for vowel properties
     col1, col2, col3, col4 = st.columns(4)
@@ -92,8 +92,6 @@ if "current_symbol" in st.session_state:
     # Update symbol and reset choices on "Continue"
     if continue_pressed:
         st.write(f"{st.session_state.user_name if 'user_name' in st.session_state else 'User'}'s score: {st.session_state.correct_count} out of {st.session_state.attempts}")
+        # Select new symbol after feedback is displayed
         st.session_state.current_symbol, st.session_state.current_data = select_random_symbol()
         st.session_state.feedback = ""  # Clear feedback for the new symbol
-        # Reset selections for the next symbol
-        for key in ["user_height", "user_backness", "user_rounding", "user_tense_lax"]:
-            st.session_state[key] = None  # Reset to None so new selection is required
