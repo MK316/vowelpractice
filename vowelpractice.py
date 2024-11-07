@@ -33,7 +33,8 @@ def validate_selections(ipa_symbol, user_height, user_backness, user_rounding, u
 # Main interface with Streamlit
 st.title("💧 Vowel Practice App")
 
-user_name = st.text_input("Enter your name:", value=st.session_state.user_name if 'user_name' in st.session_state else "")
+# User name input
+user_name = st.text_input("Enter your name:", value=st.session_state.get('user_name', ""))
 
 # Start quiz button
 if st.button("Start Quiz"):
@@ -42,28 +43,33 @@ if st.button("Start Quiz"):
     st.session_state.attempts = 0
     st.session_state.current_symbol, st.session_state.current_data = select_random_symbol()
 
+# Check if a symbol has been selected
 if "current_symbol" in st.session_state:
+    # Display the IPA Symbol along with its Name
     st.markdown(f"<h2>IPA Symbol: {st.session_state.current_symbol} ({st.session_state.current_data['Name']})</h2>", unsafe_allow_html=True)
     
-    # Display radio button options in columns
+    # Set default selected options based on session state to retain values after "Show & Continue"
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        height = st.radio("Height", ['High', 'Mid', 'Low'], key=f"height_{st.session_state.attempts}")
+        height = st.radio("Height", ['High', 'Mid', 'Low'], index=['High', 'Mid', 'Low'].index(st.session_state.get("user_height", "High")))
     with col2:
-        backness = st.radio("Backness", ['Front', 'Central', 'Back'], key=f"backness_{st.session_state.attempts}")
+        backness = st.radio("Backness", ['Front', 'Central', 'Back'], index=['Front', 'Central', 'Back'].index(st.session_state.get("user_backness", "Front")))
     with col3:
-        rounding = st.radio("Rounding", ['Rounded', 'Unrounded'], key=f"rounding_{st.session_state.attempts}")
+        rounding = st.radio("Rounding", ['Rounded', 'Unrounded'], index=['Rounded', 'Unrounded'].index(st.session_state.get("user_rounding", "Unrounded")))
     with col4:
-        tense_lax = st.radio("Tense/Lax", ['Tense', 'Lax'], key=f"tense_lax_{st.session_state.attempts}")
+        tense_lax = st.radio("Tense/Lax", ['Tense', 'Lax'], index=['Tense', 'Lax'].index(st.session_state.get("user_tense_lax", "Tense")))
+
+    # Store the current selections in session state for persistence
+    st.session_state.user_height = height
+    st.session_state.user_backness = backness
+    st.session_state.user_rounding = rounding
+    st.session_state.user_tense_lax = tense_lax
 
     # Buttons for submission and continuation
-    cols = st.columns([2, 3, 5])  # Adjust layout to position buttons closer
-    with cols[0]:
-        submit_pressed = st.button("Submit")
-    with cols[1]:
-        continue_pressed = st.button("Show score & Continue")
+    submit_pressed = st.button("Submit")
+    continue_pressed = st.button("Show score & Continue")
 
-    # Handle submission
+    # Process submission
     if submit_pressed:
         correct, _ = validate_selections(st.session_state.current_symbol, height, backness, rounding, tense_lax)
         if correct:
@@ -71,9 +77,12 @@ if "current_symbol" in st.session_state:
             st.session_state.correct_count += 1
         else:
             st.error("Incorrect!")
-        st.session_state.attempts += 1  # Increment attempts here without changing the symbol
+        st.session_state.attempts += 1
 
-    # Handle continuation
+    # Show score and move to next symbol on "Show score & Continue"
     if continue_pressed:
-        st.write(f"{st.session_state.user_name}'s score: {st.session_state.correct_count} out of {st.session_state.attempts}")
-        st.session_state.current_symbol, st.session_state.current_data = select_random_symbol()  # Now get the next symbol
+        st.write(f"{st.session_state.user_name if 'user_name' in st.session_state else 'User'}'s score: {st.session_state.correct_count} out of {st.session_state.attempts}")
+        st.session_state.current_symbol, st.session_state.current_data = select_random_symbol()  # Update symbol for next question
+        # Clear previous selections for the next question
+        for key in ["user_height", "user_backness", "user_rounding", "user_tense_lax"]:
+            st.session_state[key] = None  # Reset selections for the next question
