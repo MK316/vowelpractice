@@ -42,18 +42,19 @@ if st.button("Start Quiz"):
     st.session_state.correct_count = 0
     st.session_state.attempts = 0
     st.session_state.current_symbol, st.session_state.current_data = select_random_symbol()
+    st.session_state.feedback = ""  # Clear feedback when starting quiz
 
+# Display symbol if the quiz has started
 if "current_symbol" in st.session_state:
-    # Display the IPA Symbol along with its Name
     st.markdown(f"<h2>IPA Symbol: {st.session_state.current_symbol} ({st.session_state.current_data['Name']})</h2>", unsafe_allow_html=True)
     
-    # Handling None values in session state to avoid index error
+    # Define default selections with error handling
     height_default = st.session_state.get("user_height", "High") or "High"
     backness_default = st.session_state.get("user_backness", "Front") or "Front"
     rounding_default = st.session_state.get("user_rounding", "Unrounded") or "Unrounded"
     tense_lax_default = st.session_state.get("user_tense_lax", "Tense") or "Tense"
     
-    # Display radio buttons with preserved selections
+    # Display radio buttons for vowel properties
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         height = st.radio("Height", ['High', 'Mid', 'Low'], index=['High', 'Mid', 'Low'].index(height_default))
@@ -64,31 +65,35 @@ if "current_symbol" in st.session_state:
     with col4:
         tense_lax = st.radio("Tense/Lax", ['Tense', 'Lax'], index=['Tense', 'Lax'].index(tense_lax_default))
 
-    # Store current selections in session state to persist choices
+    # Store selections in session state to preserve choices
     st.session_state.user_height = height
     st.session_state.user_backness = backness
     st.session_state.user_rounding = rounding
     st.session_state.user_tense_lax = tense_lax
 
-    # Buttons for submission and continuation
+    # Buttons for submit and continue
     submit_pressed = st.button("Submit")
     continue_pressed = st.button("Show score & Continue")
 
-    # Process submission
+    # Process submission for feedback
     if submit_pressed:
         correct, _ = validate_selections(st.session_state.current_symbol, height, backness, rounding, tense_lax)
         if correct:
-            st.success("Correct!")
+            st.session_state.feedback = "Correct! 🎉"
             st.session_state.correct_count += 1
         else:
-            st.error("Incorrect!")
+            st.session_state.feedback = "Incorrect! Try again. ❌"
         st.session_state.attempts += 1
 
-    # Show score and move to next symbol on "Show score & Continue"
+    # Display feedback
+    if "feedback" in st.session_state:
+        st.write(st.session_state.feedback)
+
+    # Update symbol and reset choices on "Continue"
     if continue_pressed:
         st.write(f"{st.session_state.user_name if 'user_name' in st.session_state else 'User'}'s score: {st.session_state.correct_count} out of {st.session_state.attempts}")
-        # Update symbol for next question
         st.session_state.current_symbol, st.session_state.current_data = select_random_symbol()
-        # Clear previous selections for the next question
+        st.session_state.feedback = ""  # Clear feedback for the new symbol
+        # Reset selections for the next symbol
         for key in ["user_height", "user_backness", "user_rounding", "user_tense_lax"]:
-            st.session_state[key] = None  # Reset selections for the next question
+            st.session_state[key] = None  # Reset to None so new selection is required
