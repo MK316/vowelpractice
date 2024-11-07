@@ -1,7 +1,7 @@
 import streamlit as st
 import random
 
-# Vowel data from your CSV in dictionary format
+# Vowel data from your dictionary format
 vowel_data = {
     'i': {'Name': 'Lower case i', 'Height': 'High', 'Backness': 'Front', 'Rounding': 'Unrounded', 'Tense_Lax': 'Tense'},
     'ɪ': {'Name': 'Small capital i', 'Height': 'High', 'Backness': 'Front', 'Rounding': 'Unrounded', 'Tense_Lax': 'Lax'},
@@ -28,70 +28,54 @@ def validate_selections(ipa_symbol, user_height, user_backness, user_rounding, u
                correct_data['Backness'] == user_backness and
                correct_data['Rounding'] == user_rounding and
                correct_data['Tense_Lax'] == user_tense_lax)
+    
     return correct, correct_data
 
 # Main interface with Streamlit
 st.title("💧 Vowel Practice App")
 
 # Textbox for user name input, always available
-user_name = st.text_input("Enter your name:", value=st.session_state.get('user_name', ""))
+user_name = st.text_input("Enter your name:", value=st.session_state.user_name if 'user_name' in st.session_state else "")
 
 # Start quiz button
-if st.button("Start Quiz") or "current_symbol" not in st.session_state:
+if st.button("Start Quiz"):
     st.session_state.user_name = user_name
     st.session_state.correct_count = 0
     st.session_state.attempts = 0
     st.session_state.current_symbol, st.session_state.current_data = select_random_symbol()
-    st.session_state.feedback = ""  # Clear feedback when starting quiz
 
-# Display symbol if the quiz has started
 if "current_symbol" in st.session_state:
     st.markdown(f"<h2>IPA Symbol: {st.session_state.current_symbol} ({st.session_state.current_data['Name']})</h2>", unsafe_allow_html=True)
     
-    # Define default selections with error handling
-    height_default = st.session_state.get("user_height", "High")
-    backness_default = st.session_state.get("user_backness", "Front")
-    rounding_default = st.session_state.get("user_rounding", "Unrounded")
-    tense_lax_default = st.session_state.get("user_tense_lax", "Tense")
-    
-    # Display radio buttons for vowel properties
-    col1, col2, col3, col4 = st.columns(4)
+    # Using columns to organize the options
+    col1, col2, col3, col4 = st.columns([2, 2, 2, 2])
     with col1:
-        height = st.radio("Height", ['High', 'Mid', 'Low'], index=['High', 'Mid', 'Low'].index(height_default))
+        height = st.radio("Height", ['High', 'Mid', 'Low'], key=f"height_{st.session_state.attempts}")
     with col2:
-        backness = st.radio("Backness", ['Front', 'Central', 'Back'], index=['Front', 'Central', 'Back'].index(backness_default))
+        backness = st.radio("Backness", ['Front', 'Central', 'Back'], key=f"backness_{st.session_state.attempts}")
     with col3:
-        rounding = st.radio("Rounding", ['Rounded', 'Unrounded'], index=['Rounded', 'Unrounded'].index(rounding_default))
+        rounding = st.radio("Rounding", ['Rounded', 'Unrounded'], key=f"rounding_{st.session_state.attempts}")
     with col4:
-        tense_lax = st.radio("Tense/Lax", ['Tense', 'Lax'], index=['Tense', 'Lax'].index(tense_lax_default))
+        tense_lax = st.radio("Tense/Lax", ['Tense', 'Lax'], key=f"tense_lax_{st.session_state.attempts}")
 
-    # Store selections in session state to preserve choices
-    st.session_state.user_height = height
-    st.session_state.user_backness = backness
-    st.session_state.user_rounding = rounding
-    st.session_state.user_tense_lax = tense_lax
+    # Place buttons next to each other without any gap
+    cols = st.columns([2, 3, 5])
+    with cols[0]:
+        submit_pressed = st.button("Submit")
+    with cols[1]:
+        continue_pressed = st.button("Show score & Continue")
 
-    # Buttons for submit and continue
-    submit_pressed = st.button("Submit")
-    continue_pressed = st.button("Show score & Continue")
-
-    # Process submission for feedback
+    # Process the submission and update
     if submit_pressed:
         correct, _ = validate_selections(st.session_state.current_symbol, height, backness, rounding, tense_lax)
         if correct:
-            st.session_state.feedback = "Correct! 🎉"
+            st.success("Correct!")
             st.session_state.correct_count += 1
         else:
-            st.session_state.feedback = "Incorrect! Try again. ❌"
+            st.error("Incorrect!")
         st.session_state.attempts += 1
-
-    # Display feedback
-    if "feedback" in st.session_state:
-        st.write(st.session_state.feedback)
-
-    # Update symbol and reset choices on "Continue"
-    if continue_pressed:
-        st.write(f"{st.session_state.user_name if 'user_name' in st.session_state else 'User'}'s score: {st.session_state.correct_count} out of {st.session_state.attempts}")
-        # Select new symbol after feedback is displayed
         st.session_state.current_symbol, st.session_state.current_data = select_random_symbol()
-        st.session_state.feedback = ""  # Clear feedback for the new symbol
+
+    # Show score when 'Continue' is pressed
+    if continue_pressed:
+        st.write(f"{st.session_state.user_name if 'user_name' in st.session_state else 'User'} score: {st.session_state.correct_count} out of {st.session_state.attempts}")
