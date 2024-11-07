@@ -1,11 +1,19 @@
 import streamlit as st
 import random
 
-# Vowel data
+# Vowel data from your CSV in dictionary format
 vowel_data = {
     'i': {'Name': 'Lower case i', 'Height': 'High', 'Backness': 'Front', 'Rounding': 'Unrounded', 'Tense_Lax': 'Tense'},
     'ɪ': {'Name': 'Small capital i', 'Height': 'High', 'Backness': 'Front', 'Rounding': 'Unrounded', 'Tense_Lax': 'Lax'},
-    # Add the rest of your vowels here
+    'ɛ': {'Name': 'Epsilon', 'Height': 'Mid', 'Backness': 'Front', 'Rounding': 'Unrounded', 'Tense_Lax': 'Lax'},
+    'æ': {'Name': 'Ash', 'Height': 'Low', 'Backness': 'Front', 'Rounding': 'Unrounded', 'Tense_Lax': 'Lax'},
+    'u': {'Name': 'Lower case u', 'Height': 'High', 'Backness': 'Back', 'Rounding': 'Rounded', 'Tense_Lax': 'Tense'},
+    'ʊ': {'Name': 'Small capital u', 'Height': 'High', 'Backness': 'Back', 'Rounding': 'Rounded', 'Tense_Lax': 'Lax'},
+    'ɔ': {'Name': 'Open o', 'Height': 'Mid', 'Backness': 'Back', 'Rounding': 'Rounded', 'Tense_Lax': 'Tense'},
+    'ɑ': {'Name': 'Back A', 'Height': 'Low', 'Backness': 'Back', 'Rounding': 'Unrounded', 'Tense_Lax': 'Tense'},
+    'ɒ': {'Name': 'Turned back A', 'Height': 'Low', 'Backness': 'Back', 'Rounding': 'Rounded', 'Tense_Lax': 'Tense'},
+    'ʌ': {'Name': 'Caret', 'Height': 'Mid', 'Backness': 'Central', 'Rounding': 'Unrounded', 'Tense_Lax': 'Lax'},
+    'ə': {'Name': 'Schwa', 'Height': 'Mid', 'Backness': 'Central', 'Rounding': 'Unrounded', 'Tense_Lax': 'Lax'}
 }
 
 def select_random_symbol():
