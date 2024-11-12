@@ -12,7 +12,7 @@ vowel_data = {
     'ɔ': {'Name': 'Open o', 'Height': 'Mid', 'Backness': 'Back', 'Rounding': 'Rounded', 'Tense_Lax': 'Tense'},
     'ɑ': {'Name': 'Back A', 'Height': 'Low', 'Backness': 'Back', 'Rounding': 'Unrounded', 'Tense_Lax': 'Tense'},
     'ɒ': {'Name': 'Turned back A', 'Height': 'Low', 'Backness': 'Back', 'Rounding': 'Rounded', 'Tense_Lax': 'Tense'},
-    'ʌ': {'Name': 'Caret', 'Height': 'Mid', 'Backness': 'Central', 'Rounding': 'Unrounded', 'Tense_Lax': 'Lax'},
+    'ʌ': {'Name': 'Caret (Mid-low central vowel)', 'Height': 'Low', 'Backness': 'Central', 'Rounding': 'Unrounded', 'Tense_Lax': 'Lax'},
     'ə': {'Name': 'Schwa', 'Height': 'Mid', 'Backness': 'Central', 'Rounding': 'Unrounded', 'Tense_Lax': 'Lax'}
 }
 
